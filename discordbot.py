@@ -16,7 +16,7 @@ from requests.exceptions import HTTPError
 ######################################################
 
 bot = discord.Client()
-RIOT_TOKEN = 'RGAPI-fca51db6-85d0-4b38-956f-0d7081d9dd67' # Needs to be updated every day.. bro.
+RIOT_TOKEN = '***REMOVED***' # Needs to be updated every day.. bro.
 BOT_TOKEN = '***REMOVED***'
 CB_TOKEN = '***REMOVED***'
 REPLY_TIMEFRAME = 3		# Minutes to wait before resetting cb
