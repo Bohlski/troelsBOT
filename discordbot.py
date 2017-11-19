@@ -4,6 +4,7 @@ import time
 import urllib
 import random
 import bs4
+import youtube_dl
 from discord.ext import commands
 from requests.exceptions import HTTPError
 
@@ -22,6 +23,7 @@ CB_TOKEN = '***REMOVED***'
 REPLY_TIMEFRAME = 3		# Minutes to wait before resetting cb
 cb_last_call = 0		# Time for last call to cb
 conversation_key = ''
+players = {}
 
 @bot.event
 async def on_ready():
@@ -50,6 +52,7 @@ async def on_message(message):
 		print('Logging out...\n')
 		await bot.logout()
 		await bot.close()
+	# Command !gud - Just Troels things..
 	elif message.content.startswith('!gud'):
 		await bot.send_message(message.channel, 'Du kan bare kalde mig Troels.. :BrokeBack:')
 	# Command !roll - returns message with roll between 0 and specified number (default: 100) 
@@ -60,6 +63,7 @@ async def on_message(message):
 			await bot.send_message(message.channel, '%s rolled %s.' % (author[:-5], random.randint(0, int(roll_args[1]))))
 		else:
 			await bot.send_message(message.channel, '%s rolled %s.' % (author[:-5], random.randint(0, 100)))
+
 	# Command !lolss - returns message with lol stats for given name and region
 	elif message.content.startswith('!lolss'):
 		search_args = message.content.split('"')
@@ -73,12 +77,24 @@ async def on_message(message):
 			await summoner_search(message, summoner_name, region)
 		else:
 			await bot.send_message(message.channel, '**Usage**: !lolss "<name>" <region>')
+
 	# Command !youtube - returns a link for the top search on youtube with the given argument
 	elif message.content.startswith('!youtube'):
 		await youtube_search(message)
+	# Command !play - Join the callers channel and play a given youtube-url
+	elif message.content.startswith('!play'):
+		await youtube_play(message)
+	# Command !pause - Pause the current playing youtube-url
+	elif message.content.startswith('!pause'):
+		await youtube_pause(message)
+	# Command !resume - Resume playing youtube-url
+	elif message.content.startswith('!resume'):
+		await youtube_resume(message)
+
 	# Command !op.gg - returns a link for op.gg page of a given name and region (very lazy)
 	elif message.content.startswith('!opgg'):
 		await opgg_search(message)
+
 	# Command for everything else when bot is prompted
 	elif message.content.startswith('!'):
 		await cleverbot_ask(message)
@@ -167,6 +183,36 @@ async def summoner_search(message, summoner_name, region):
 			print(err.args)
 			await bot.send_message(message.channel, '**Error during lookup of summoner stats**')
 			return
+
+
+# VIRKELIG GRIM INDTIL VIDERE
+async def youtube_play(message):
+	yt_url = message.content[6:]
+	try:
+		channel = message.author.voice.voice_channel
+		voice = await bot.join_voice_channel(channel)
+		player = await voice.create_ytdl_player(yt_url)
+		players[message.server.id] = player
+		player.start()
+		await bot.send_message(message.channel, "Now playing {}.".format(player.title))
+	except discord.errors.InvalidArgument:
+		await bot.send_message(message.channel, "You're not in a voice channel. Please join one before using !play.")
+	except:
+		await bot.send_message(message.channel, "Something went wrong.")
+
+
+async def youtube_pause(message):
+	try:
+		players[message.server.id].pause()
+	except:
+		pass
+
+
+async def youtube_resume(message):
+	try:
+		players[message.server.id].resume()
+	except:
+		pass
 
 
 async def youtube_search(message):
