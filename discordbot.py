@@ -197,7 +197,8 @@ async def youtube_play(message):
 		await bot.send_message(message.channel, "Now playing {}.".format(player.title))
 	except discord.errors.InvalidArgument:
 		await bot.send_message(message.channel, "You're not in a voice channel. Please join one before using !play.")
-	except:
+	except Exception as error:
+		print(error)
 		await bot.send_message(message.channel, "Something went wrong.")
 
 
