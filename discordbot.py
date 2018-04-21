@@ -4,13 +4,13 @@ import time
 import urllib
 import random
 import bs4
+import pyimgflip
 import youtube_dl
 from discord.ext import commands
 from requests.exceptions import HTTPError
 
 ######################################################
 # TO DO:
-# - Make youtube search
 # - Make polls with reactions? :D
 # - Put cleverbot globalvariables in file or some shit
 # - Fix summoner search to allow name without ""??
@@ -94,6 +94,9 @@ async def on_message(message):
 	# Command !op.gg - returns a link for op.gg page of a given name and region (very lazy)
 	elif message.content.startswith('!opgg'):
 		await opgg_search(message)
+
+	elif message.content.startswith('!sponge'):
+		await spongebob_meme(message)
 
 	# Command for everything else when bot is prompted
 	elif message.content.startswith('!'):
@@ -243,6 +246,26 @@ async def opgg_search(message):
 		print('Making op.gg url for "{}" ({})...'.format(summoner_name, region))
 		url = 'https://{}.op.gg/summoner/userName={}'.format(region, summoner_name)
 		await bot.send_message(message.channel, url)
+
+
+async def spongebob_meme(message):
+	args = get_search_args(message)
+	if len(args) != 3: # I'm lazy
+		await bot.send_message(message.channel, '**Usage**: !sponge "<text>"')
+	else:
+		spongified_word = ''
+		capitalize = True
+		for letter in args[1]:
+			if capitalize:
+				spongified_word += letter.upper()
+			else:
+				spongified_word += letter
+			capitalize = not capitalize
+		imgflip = pyimgflip.Imgflip(username='***REMOVED***', password='***REMOVED***')
+		print("Generating spongebob meme..")
+		result = imgflip.caption_image(102156234, spongified_word, '')
+		print("Meme available at URL: " + result['url'])
+		await bot.send_message(message.channel, result['url'])
 
 
 if __name__ == '__main__':
