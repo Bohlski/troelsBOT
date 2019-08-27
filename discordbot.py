@@ -18,10 +18,12 @@ from requests.exceptions import HTTPError
 
 bot = discord.Client()
 with open('config.txt') as f:
-	tokens = f.read().strip().split()
-	RIOT_TOKEN = tokens[0] # Needs to be updated every day..
-	BOT_TOKEN = tokens[1]
-	CB_TOKEN = tokens[2]
+	config_items = f.read().strip().split()
+	RIOT_TOKEN = config_items[0] # Needs to be updated every day..
+	BOT_TOKEN = config_items[1]
+	CB_TOKEN = config_items[2]
+	IMGFLIP_USER = config_items[3]
+	IMGFLIP_PASS = config_items[4]
 REPLY_TIMEFRAME = 3		# Minutes to wait before resetting cb
 cb_last_call = 0		# Time for last call to cb
 conversation_key = ''
@@ -263,7 +265,7 @@ async def spongebob_meme(message):
 			else:
 				spongified_word += letter
 			capitalize = not capitalize
-		imgflip = pyimgflip.Imgflip(username='***REMOVED***', password='***REMOVED***')
+		imgflip = pyimgflip.Imgflip(username=IMGFLIP_USER, password=IMGFLIP_PASS)
 		print("Generating spongebob meme..")
 		result = imgflip.caption_image(102156234, spongified_word, '')
 		print("Meme available at URL: " + result['url'])
